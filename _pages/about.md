@@ -2,29 +2,27 @@
 layout: about
 title: about
 permalink: /
-description: low-level software geek
+description: Robotics & Computer Vision enthusiast
 
 profile:
   align: right
-  image: img_profile.jpg
+  image: img_profile.jpeg
 
 news: false  # includes a list of news items
 selected_papers: false # includes a list of papers marked as "selected={true}"
 social: true  # includes social icons at the bottom of the page
 ---
 
-Compiler Engineer @ AMD. ECE undergrad from VJTI (2022). 
-I have been a hardware geek since I was in 8th grade, started off by reading Electronics For you mags in the school library.
-
-<!-- For the past one year I have been working on [Open Authenticator](https://open-authenticator.github.io/) in my free time. It is an open source TOTP based hardware authenticator using ESP32. The beta build is available for sale on [Tindie](https://www.tindie.com/products/vedantvp16/open-authenticator-beta-build/). -->
+Research Intern @MOONlab, IISER Bhopal  <br>
+Third year Computer Engineering undergrad from VJTI, Mumbai (2024). 
 
 My Research Interests are:
-* Operating Systems
-* Compilers
-* Embedded systems
-* Computer Architecture
+* Robotics & Automation
+* Computer Vision
+* SLAM
+* Control Systems
 
-For a quick chat you can reach me out on Matrix [@vedant16:matrix.org](https://matrix.to/#/@vedant16:matrix.org) or email me at [vedant@ve0x10.in](mailto:vedant@ve0x10.in)
+You can reach me out on Matrix [@kunalagarwal18:matrix.org](https://matrix.to/#/kunalagarwal18:matrix.org) or email me at [kunalagarwal1072002@gmail.com](mailto:kunalagarwal1072002@gmail.com)
 
 # Experience
 
@@ -41,6 +39,7 @@ For a quick chat you can reach me out on Matrix [@vedant16:matrix.org](https://m
         {{ experience.year }}
     </span>
     {% endif %}
+    <hr>
     {% if experience.description %}
         <ul class="items">
             {% for item in experience.description %}
