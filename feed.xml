@@ -1,0 +1,417 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.1">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2022-11-07T10:31:49+00:00</updated><id>/feed.xml</id><title type="html">blank</title><subtitle>Portfolio and blog for Vedant Paranjape.
+</subtitle><entry><title type="html">Bringing up the parsec-3.0 benchmark</title><link href="/blog/2022/running-parsec-benchmark/" rel="alternate" type="text/html" title="Bringing up the parsec-3.0 benchmark" /><published>2022-02-25T12:15:00+00:00</published><updated>2022-02-25T12:15:00+00:00</updated><id>/blog/2022/running-parsec-benchmark</id><content type="html" xml:base="/blog/2022/running-parsec-benchmark/"><![CDATA[<h2 id="what-is-parsec-">What is PARSEC ?</h2>
+
+<p>The Princeton Application Repository for Shared-Memory Computers (PARSEC) is a benchmark suite composed of multithreaded programs. The suite focuses on emerging workloads and was designed to be representative of next-generation shared-memory programs for chip-multiprocessors.</p>
+
+<h2 id="getting-started">Getting started</h2>
+
+<ul>
+  <li>Download the <a href="https://parsec.cs.princeton.edu/index.htm">PARSEC</a> release 3.0 from here the site</li>
+</ul>
+
+<p align="center">
+    <a href="http://parsec.cs.princeton.edu/download/3.0/parsec-3.0.tar.gz">
+        <img class="img-fluid rounded z-depth-1" src="https://parsec.cs.princeton.edu/image/download-3.0.png" />
+    </a>
+</p>
+
+<ul>
+  <li>
+    <p>Download the tutorial for parsec-3.0 from <a href="https://parsec.cs.princeton.edu/download/tutorial/3.0/parsec-tutorial.pdf">here</a> or refer to the <a href="https://parsec.cs.princeton.edu/parsec3-doc.htm">wiki</a> one. The pdf tutorial seems to be hidden off in some corner of the website unfortunately.</p>
+  </li>
+  <li>Source the env by going into the parsec root directory.
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>source env.sh
+</code></pre></div>    </div>
+  </li>
+  <li>Build all the apps that can be benchmarked
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>parsecmgmt -a build -p all -c gcc
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h2 id="issues-faced">Issues faced</h2>
+
+<p>Here are some of the links which helped me solve the issues.</p>
+
+<ul>
+  <li><a href="https://yulistic.gitlab.io/2016/05/parsec-3.0-installation-issues/">https://yulistic.gitlab.io/2016/05/parsec-3.0-installation-issues/</a></li>
+  <li><a href="https://groups.google.com/g/snipersim/c/8q9mjnoePbM">https://groups.google.com/g/snipersim/c/8q9mjnoePbM</a></li>
+  <li><a href="https://github.com/lutris/ffmpeg-nvenc/issues/5">https://github.com/lutris/ffmpeg-nvenc/issues/5</a></li>
+</ul>
+
+<p>The first link is very detailed, please go through that first to check if you encounter any of the above issues. Other than those issues, I have listed the ones I faced.</p>
+
+<p>1) Issue with C++ version</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>In file included from /home/qfettes/benchmarks/parsec/parsec-2.1/./pkgs/apps/bodytrack/src/TrackingBenchmark/threads/WorkerGroup.cpp:17:0:
+/home/qfettes/benchmarks/parsec/parsec-2.1/./pkgs/apps/bodytrack/src/TrackingBenchmark/threads/WorkerGroup.h:88:5: error: looser throw specifier <span class="k">for</span> <span class="s1">'virtual threads::WorkerGroup::~WorkerGroup() throw (threads::CondException, threads::MutexException)'</span>
+     ~WorkerGroup<span class="o">()</span><span class="p">;</span>
+     ^
+In file included from /home/qfettes/benchmarks/parsec/parsec-2.1/./pkgs/apps/bodytrack/src/TrackingBenchmark/threads/WorkerGroup.h:18:0,
+                 from /home/qfettes/benchmarks/parsec/parsec-2.1/./pkgs/apps/bodytrack/src/TrackingBenchmark/threads/WorkerGroup.cpp:17:
+/home/qfettes/benchmarks/parsec/parsec-2.1/./pkgs/apps/bodytrack/src/TrackingBenchmark/threads/Thread.h:31:13: error:   overriding <span class="s1">'virtual threads::Runnable::~Runnable() noexcept'</span>
+     virtual ~Runnable<span class="o">()</span> <span class="o">{}</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>Solution: Add <code class="language-plaintext highlighter-rouge">-std=c++11</code> to the line <code class="language-plaintext highlighter-rouge">export CXXFLAGS</code> in the file <code class="language-plaintext highlighter-rouge">config/gcc.bldconf</code></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>export CXXFLAGS="-O3 -g -funroll-loops -fprefetch-loop-arrays -fpermissive -fno-exceptions ${PORTABILITY_FLAGS} -std=c++11"
+</code></pre></div></div>
+
+<p>2) Issue with compiling x264</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/usr/bin/ld: libx264.a<span class="o">(</span>cabac-a.o<span class="o">)</span>: relocation R_X86_64_32 against symbol x264_cabac_range_lps<span class="s1">' can not be used when making a shared object; recompile with -fPIC /usr/bin/ld: libx264.a(quant-a.o): relocation R_X86_64_32 against hidden symbolx264_pb_01'</span> can not be used when making a shared object
+/usr/bin/ld: libx264.a<span class="o">(</span>dct-a.o<span class="o">)</span>: relocation R_X86_64_32 against hidden symbol x264_pw_8000<span class="s1">' can not be used when making a shared object /usr/bin/ld: libx264.a(deblock-a.o): relocation R_X86_64_32 against hidden symbolx264_pb_1'</span> can not be used when making a shared object
+/usr/bin/ld: libx264.a<span class="o">(</span>mc-a.o<span class="o">)</span>: relocation R_X86_64_32 against hidden symbol x264_pw_64<span class="s1">' can not be used when making a shared object /usr/bin/ld: libx264.a(mc-a2.o): relocation R_X86_64_32 against hidden symbolx264_pw_32'</span> can not be used when making a shared object
+</code></pre></div></div>
+
+<p>Solution: The problem here is that we need to enable fPIC in the configure step. Add <code class="language-plaintext highlighter-rouge">--enable-pic </code> to <code class="language-plaintext highlighter-rouge">build_conf</code> in the file <code class="language-plaintext highlighter-rouge">pkgs/apps/x264/parsec/gcc-pthreads.bldconf</code></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>build_conf="--enable-pthread --enable-pic --extra-asflags=\"${ASFLAGS}\" --extra-cflags=\"${CFLAGS}\" --extra-ldflags=\"${LDFLAGS} ${LIBS}\""
+</code></pre></div></div>]]></content><author><name></name></author><summary type="html"><![CDATA[The parsec benchmark doesn't seem to work out of the box and needs few changes, this post describes those]]></summary></entry><entry><title type="html">Midway through Google Summer of Code 21 with libcamera</title><link href="/blog/2021/gsoc-libcamera/" rel="alternate" type="text/html" title="Midway through Google Summer of Code 21 with libcamera" /><published>2021-07-19T23:40:16+00:00</published><updated>2021-07-19T23:40:16+00:00</updated><id>/blog/2021/gsoc-libcamera</id><content type="html" xml:base="/blog/2021/gsoc-libcamera/"><![CDATA[<p>I began, as most GSoC-ers do, buried in a mountain of code. Initially working with libcamera was intimidating to be honest. Simply because, it’s much more difficult to understand and contribute to code that is written by someone else. After digging through each and every function and figuring out what its use was, I could finally start to see the bigger picture that was Libcamera and how gstreamer fit in. Docs of gstreamer and glib came in very handy. I had a decent idea of how to use libcamera, my efforts in solving the warm up tasks paid off well.</p>
+
+<p>Here’s my progress tracker: <a href="https://ve0x10.in/gsoc2021/">https://ve0x10.in/gsoc2021/</a></p>
+
+<h1 id="experience">Experience</h1>
+<h2 id="student-application-period">Student Application period</h2>
+<p>Armed with my experience of applying to GSoC organization last year, I applied the same this year, communication being the most important point for being selected. I logged everything I did and was active on libcamera IRC asking doubts and improving my understanding of libcamera. One major obstacle I faced in <strong>Student Application period</strong> was learning how to send a patch over email. The first patch I sent was adding troubleshooting section in the README, after 10-15 versions and long thread of discussion over mailing list, it was finally accepted and merged in. Felt like I had just won a <a href="https://git.linuxtv.org/libcamera.git/commit/?id=76a5861f3ef0950d9b57e54668c9059ed7bddd89">trophy</a>. Special thanks to the libcamera community who walked me through everything like I’m a 5-year-old, i.e, answered all my doubts even though basic. While first trying to compile and test the example apps in libcamera, I faced few issues and I did document them and how I got around them, and this helped me big time while doing my project and also to exhibit my seriousness to my mentors. Here’s the two logs: <a href="https://ve0x10.in/blog/2021/03/23/libcamera-log.html">1</a> and <a href="https://ve0x10.in/blog/2021/04/04/libcamera-log-2.html">2</a>.</p>
+
+<h2 id="community-bonding">Community Bonding</h2>
+<p>Results were out on May 17th, I got a mail at 23:30 of my selection. Although I didn’t feel the naive excitement of being selected for GSoC for the very first time, but it did make me happy to see my efforts rewarded by my mentors and that I’d get to work on a <em>linux kernel</em>-like open source project (I mean in terms of way of contributions). After selection, I got in touch with both of my mentors, Paul and Nicolas. Finding a common time for a weekly meeting was tricky, as we all lived in equally spaced three different timezones, Nicolas in Canada, me in India and Paul in Japan, we did settle on a time and I created a matrix group for discussion with my mentors.</p>
+
+<h2 id="coding-period">Coding Period</h2>
+<p>I couldn’t read much in the community bonding period, as I had other stuff to attend to. Come June and I was finally free, I started working from 1 June itself, i.e. one week before the official start date. I started with going through the gstreamer libcamera element’s source code. Much of the code was like a alien language to me, as I had never worked with gstreamer or glib. glib is a C library which adds C++ like OOPS features to C, and gstreamer uses it extensively. glib is a pretty complex library, I had to give in extra efforts to understand basic things like how a class is defined using glib, it has a very non-intuitve way to do so, I’ll give a short example.</p>
+
+<ul>
+  <li>gstlibcamerasrc.h
+    <div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="cp">#define GST_TYPE_LIBCAMERA_SRC gst_libcamera_src_get_type()
+</span>  <span class="n">G_DECLARE_FINAL_TYPE</span><span class="p">(</span><span class="n">GstLibcameraSrc</span><span class="p">,</span> <span class="n">gst_libcamera_src</span><span class="p">,</span>
+              <span class="n">GST_LIBCAMERA</span><span class="p">,</span> <span class="n">SRC</span><span class="p">,</span> <span class="n">GstElement</span><span class="p">)</span>
+</code></pre></div>    </div>
+  </li>
+  <li>gstlibcamerasrc.cpp
+    <div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="k">struct</span> <span class="n">_GstLibcameraSrc</span> <span class="p">{</span>
+      <span class="n">GstElement</span> <span class="n">parent</span><span class="p">;</span>
+
+      <span class="n">GRecMutex</span> <span class="n">stream_lock</span><span class="p">;</span>
+      <span class="n">GstTask</span> <span class="o">*</span><span class="n">task</span><span class="p">;</span>
+
+      <span class="n">gchar</span> <span class="o">*</span><span class="n">camera_name</span><span class="p">;</span>
+
+      <span class="n">GstLibcameraSrcState</span> <span class="o">*</span><span class="n">state</span><span class="p">;</span>
+      <span class="n">GstLibcameraAllocator</span> <span class="o">*</span><span class="n">allocator</span><span class="p">;</span>
+      <span class="n">GstFlowCombiner</span> <span class="o">*</span><span class="n">flow_combiner</span><span class="p">;</span>
+  <span class="p">};</span>
+
+  <span class="n">G_DEFINE_TYPE_WITH_CODE</span><span class="p">(</span><span class="n">GstLibcameraSrc</span><span class="p">,</span> <span class="n">gst_libcamera_src</span><span class="p">,</span> <span class="n">GST_TYPE_ELEMENT</span><span class="p">,</span>
+              <span class="n">GST_DEBUG_CATEGORY_INIT</span><span class="p">(</span><span class="n">source_debug</span><span class="p">,</span> <span class="s">"libcamerasrc"</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>
+                          <span class="s">"libcamera Source"</span><span class="p">))</span>
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<p>Welcome to the rabbit hole that is glib, yes this is how you define a gclass called <code class="language-plaintext highlighter-rouge">GstLibcameraSrc</code>, to be fair it does provide excellent documentation. Another feature of glib which is equally confusing is <code class="language-plaintext highlighter-rouge">g_pointer</code> and how it handles references. There’s no equivalent of a <code class="language-plaintext highlighter-rouge">unique_ptr</code> and <code class="language-plaintext highlighter-rouge">shared_ptr</code>, there’s just a normal <code class="language-plaintext highlighter-rouge">gpointer</code> (also <code class="language-plaintext highlighter-rouge">g_autoptr</code> and <code class="language-plaintext highlighter-rouge">g_autofree</code>). Now each pointer has a count of references, to put it in layman’s terms number of copies that exist for a pointer, you might confuse this for a <code class="language-plaintext highlighter-rouge">std::shared_ptr</code> but don’t it’s not a <code class="language-plaintext highlighter-rouge">shared_ptr</code> or a <code class="language-plaintext highlighter-rouge">unique_ptr</code>. To achieve a functionality <em>similar</em> to <code class="language-plaintext highlighter-rouge">shared_ptr</code>, there are two functions called <code class="language-plaintext highlighter-rouge">g_object_ref()</code> and <code class="language-plaintext highlighter-rouge">g_object_unref()</code>.</p>
+
+<p>Here’s what the docs for <code class="language-plaintext highlighter-rouge">g_object_ref</code> say</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Increases the reference count of object .
+</code></pre></div></div>
+<p>and Here’s what the docs for <code class="language-plaintext highlighter-rouge">g_object_unref</code> say</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Decreases the reference count of object . When its reference count drops to 0, the object is finalized (i.e. its memory is freed).
+</code></pre></div></div>
+
+<p>So, tldr, with these two functions the pointer behaves like a <code class="language-plaintext highlighter-rouge">shared_ptr</code>, so whenever I’d want to pass a pointer into some other functional block of code, one should take reference of it and pass the reference, and unref it instead of freeing it when done. Coming to the next function, called <code class="language-plaintext highlighter-rouge">g_steal_pointer</code> which does something <em>similar</em> to a <code class="language-plaintext highlighter-rouge">unique_ptr</code>. As the name suggests it steals the ownership of the pointer passed to it and passes it to the caller of the macro.</p>
+
+<p>Here’s what the docs for <code class="language-plaintext highlighter-rouge">g_steal_pointer</code> say</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Conceptually, this transfers the ownership of the pointer from the referenced variable to the "caller" of the macro (ie: "steals" the reference).
+</code></pre></div></div>
+<p>To be accurate, <code class="language-plaintext highlighter-rouge">g_steal_pointer</code> is much like <code class="language-plaintext highlighter-rouge">std::move</code>, it will not affect any other hard references but only transfer ownership of the pointer passed to it.</p>
+
+<p>Finally, having understood the nitty-gritty of glib, I ventured into gstreamer world, it was relatively easier than glib. Since I had already read docs about creating a custom gstreamer element, this stage was pretty quick. I had come up with a plan to first implement live reconfig on gstreamer, but on discussing this with mentors I was advised not to work on this, I was suggested to work on getting request pads working when gstreamer was not in <code class="language-plaintext highlighter-rouge">PLAYING</code> state. I simply had to implement two callback functions <code class="language-plaintext highlighter-rouge">_request_new_pad</code> and <code class="language-plaintext highlighter-rouge">_release_pad</code> and then pass the function pointer of these to their respective callback handlers in <code class="language-plaintext highlighter-rouge">gst_libcamera_src_class_init</code>. This was a quick step, but the first draft did compile, but it was far from being correct and working. There was an issue with how I was handling mutex. In the <code class="language-plaintext highlighter-rouge">gst_libcamera_src_request_new_pad</code> function, I was taking a lock on <code class="language-plaintext highlighter-rouge">GstLibcameraSrc</code> as follows <code class="language-plaintext highlighter-rouge">GLibLocker lock(GST_OBJECT(self));</code> and then doing the necessary steps. One of the steps was adding the new source pad to <code class="language-plaintext highlighter-rouge">GstElement</code> as follows <code class="language-plaintext highlighter-rouge">gst_element_add_pad(element, pad)</code>. With this code, It ended in a deadlock, and I was not sure why. Again, the reason was the stark difference between <code class="language-plaintext highlighter-rouge">std::mutex</code> and <code class="language-plaintext highlighter-rouge">GMutex</code>. If I lock a <code class="language-plaintext highlighter-rouge">GObject</code> using <code class="language-plaintext highlighter-rouge">GMutex</code> that object is locked even for the scope where the object lock was taken. <code class="language-plaintext highlighter-rouge">std::mutex</code> doesn’t behave this way, and I expected it to. So, in short I was trying to add pad to <code class="language-plaintext highlighter-rouge">element</code> even though it was locked, and thus it ended in a deadlock, with a bit of refactoring the code this problem was eliminated, and boom it started working. Ah, I didn’t get multistream <em>yet</em>, it still failed but not due to deadlock, though a request pad was created and destroyed successfully, thus my callback functions were functional.</p>
+
+<p>Next step was writing test code to try multistream functionality. I wrote a example app, but I couldn’t get it working for 2-3 days as I was doing it all wrong. It did create two windows, but only one of them had video from camera other one was blank (app window blurred for privacy)</p>
+
+<p align="center"><img class="img-fluid rounded z-depth-1" src="/assets/img/gsoc-log-1/multistream-fail.png" /></p>
+
+<p>It was something very simple I just had to use gst-launch, I was overengineering it all. Nicolas helped me write the command to make it work, it was as easy as this:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gst-launch-1.0 libcamerasrc camera-name="/base/soc/i2c0mux/i2c@1/ov5647@36" name=src src.src ! queue ! videoconvert ! autovideosink src.src_0 ! queue ! videoconvert ! autovideosink
+</code></pre></div></div>
+<p>Since UVC pipeline doesn’t support multistream output, and my laptop has a UVC webcam. I had to shift to a Raspberry Pi 4B+ and use a CSI camera with it, rpi pipeline does support multistream. It took some time to make a working setup, but then it did finally work. I was hardly one week into the internship and I had completed the primary goal of my GSoC project, the amount of code that was needed was surprisingly less, but it did require a considerable amount of understanding and effort to make the changes. It worked, it had a issue, color of one of the stream was incorrect, and I have not able to solve this issue to date. The next step was creating a patch and submitting the patch, it took quite a lot of time to finally get reviewed-by tag. I refactored the code twice to make sure the object is locked for the minimum required time, after a few corrections to the commit message, it was finally merged on 25th June. Here’s the <a href="https://git.linuxtv.org/libcamera.git/commit/?id=53a0d80af0f9983d6bc0d54b0e85403a08721488">commit</a></p>
+
+<p align="center"><img class="img-fluid rounded z-depth-1" src="/assets/img/gsoc-log-1/multistream-pass.png" /></p>
+
+<p>Like I mentioned earlier, the multistream output on raspberry-pi had color disparity. This was the next big task that I needed to fix, upon going through debug logs, I found there was a mismatch between libcamera pixel format and v4l2 pixel format. The next few weeks I worked on fixing this and submitting the patches, they were merged in eventually. But this didn’t fix the color format issue. As of now, I have started working on live reconfig functionality.</p>
+
+<h1 id="summary">Summary</h1>
+<p>Lot of work still needs to be done. Since I finished my primary goal pretty early, Nicolas suggested that it would be good if I make a Qt-GUI app using gstreamer libcamera element which will also showcase multistream capabilities. Other than this, I need to work on live reconfig, such that request pads can be allocated even when gstreamer is in <code class="language-plaintext highlighter-rouge">PLAYING</code> state</p>]]></content><author><name></name></author><summary type="html"><![CDATA[This is a writeup describing my experience uptil now working with libcamera]]></summary></entry><entry><title type="html">Making a simple camera streamer with libcamera</title><link href="/blog/2021/libcamera-log-2/" rel="alternate" type="text/html" title="Making a simple camera streamer with libcamera" /><published>2021-04-04T23:40:16+00:00</published><updated>2021-04-04T23:40:16+00:00</updated><id>/blog/2021/libcamera-log-2</id><content type="html" xml:base="/blog/2021/libcamera-log-2/"><![CDATA[<p><strong>I am applying for GSoC again, but this time with libcamera. I will log issues I faced while compiling and running it</strong></p>
+
+<p><a href="https://github.com/VedantParanjape/libcamera-test-app">Here’s the link to the simple camera streamer app made using Qt5 and libcamera</a>. I did this for learning more about libcamera in general, and it pretty much cleared libcamera for me.</p>
+
+<h2 id="a-gist-of-what-i-did">A Gist of what I did</h2>
+
+<p>I used qcam as a reference. I went through it’s code and figured out how exactly libcamera is interfaced with Qt Widgets to display the stream. The main driver is the QImage widget. It is repeatedly passed a buffer which holds the frames from webcam, so it updates fairly quickly (I got around 80+ fps) and appears as continuous stream of frames.</p>
+
+<p align="center"><img class="img-fluid rounded z-depth-1" src="/assets/img/libcamera-2/fps-snap.png" /></p>
+
+<p>To give a overview of how I implemented this. Initialised libcamera as usual. Create an object of the Camera Manager, then start it. Then it looks for camera’s connected to the system. Get the id of the first one that is found <code class="language-plaintext highlighter-rouge">cm-&gt;cameras()[0]-&gt;id()</code> and then use this id to acquire access to the camera.</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Start the camera manager which handles all the camera's in the syste,</span>
+<span class="n">libcamera</span><span class="o">::</span><span class="n">CameraManager</span> <span class="o">*</span><span class="n">cm</span> <span class="o">=</span> <span class="k">new</span> <span class="n">libcamera</span><span class="o">::</span><span class="n">CameraManager</span><span class="p">();</span>
+<span class="n">cm</span><span class="o">-&gt;</span><span class="n">start</span><span class="p">();</span>
+
+<span class="c1">// Display all the camera's connected to the system</span>
+<span class="k">for</span> <span class="p">(</span><span class="k">auto</span> <span class="k">const</span> <span class="o">&amp;</span><span class="n">camera</span> <span class="o">:</span> <span class="n">cm</span><span class="o">-&gt;</span><span class="n">cameras</span><span class="p">())</span>
+<span class="p">{</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"Camera ID: "</span> <span class="o">&lt;&lt;</span> <span class="n">camera</span><span class="o">-&gt;</span><span class="n">id</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">// Extract id of the first camera detected</span>
+<span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">camera_id</span> <span class="o">=</span> <span class="n">cm</span><span class="o">-&gt;</span><span class="n">cameras</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">id</span><span class="p">();</span>
+<span class="c1">// Get the camera object connected to the camera</span>
+<span class="n">camera</span> <span class="o">=</span> <span class="n">cm</span><span class="o">-&gt;</span><span class="n">get</span><span class="p">(</span><span class="n">camera_id</span><span class="p">);</span>
+<span class="c1">// Acquire the camera so no other process can use it</span>
+<span class="n">camera</span><span class="o">-&gt;</span><span class="n">acquire</span><span class="p">();</span>
+</code></pre></div></div>
+
+<p>After this we need to configure the camera, i.e. specify the image to be used, pixel format in which frames will be generated, etc. We assign <code class="language-plaintext highlighter-rouge">StreamRole::Raw</code> to the stream, and then also specify the pixel format which matches the one supported by <code class="language-plaintext highlighter-rouge">QImage</code> widget. After this we need to validate if the said config is correct. Once it is done, we configure the camera to run with the given config <code class="language-plaintext highlighter-rouge">camera-&gt;configure(config.get());</code>.</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Config the camera with Raw StreamRole</span>
+<span class="n">std</span><span class="o">::</span><span class="n">unique_ptr</span><span class="o">&lt;</span><span class="n">libcamera</span><span class="o">::</span><span class="n">CameraConfiguration</span><span class="o">&gt;</span> <span class="n">config</span> <span class="o">=</span> <span class="n">camera</span><span class="o">-&gt;</span><span class="n">generateConfiguration</span><span class="p">({</span><span class="n">libcamera</span><span class="o">::</span><span class="n">StreamRole</span><span class="o">::</span><span class="n">Raw</span><span class="p">});</span>
+
+<span class="c1">// Get the StreamConfiguration Object so that we can change it's parameters</span>
+<span class="n">libcamera</span><span class="o">::</span><span class="n">StreamConfiguration</span> <span class="o">&amp;</span><span class="n">streamConfig</span> <span class="o">=</span> <span class="n">config</span><span class="o">-&gt;</span><span class="n">at</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+
+<span class="c1">// Try to set the pixel format given by libcamera to one that is compatible</span>
+<span class="c1">// with QImage widget</span>
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">PixelFormat</span><span class="o">&gt;</span> <span class="n">formats</span> <span class="o">=</span> <span class="n">streamConfig</span><span class="p">.</span><span class="n">formats</span><span class="p">().</span><span class="n">pixelformats</span><span class="p">();</span>
+<span class="k">for</span> <span class="p">(</span><span class="k">const</span> <span class="n">PixelFormat</span> <span class="o">&amp;</span><span class="n">format</span> <span class="o">:</span> <span class="n">nativeFormats</span><span class="p">.</span><span class="n">keys</span><span class="p">())</span>
+<span class="p">{</span>
+    <span class="k">auto</span> <span class="n">match</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">find_if</span><span class="p">(</span><span class="n">formats</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">formats</span><span class="p">.</span><span class="n">end</span><span class="p">(),</span>
+                                <span class="p">[</span><span class="o">&amp;</span><span class="p">](</span><span class="k">const</span> <span class="n">PixelFormat</span> <span class="o">&amp;</span><span class="n">f</span><span class="p">)</span> <span class="p">{</span>
+                                    <span class="k">return</span> <span class="n">f</span> <span class="o">==</span> <span class="n">format</span><span class="p">;</span>
+                                <span class="p">});</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">match</span> <span class="o">!=</span> <span class="n">formats</span><span class="p">.</span><span class="n">end</span><span class="p">())</span>
+    <span class="p">{</span>
+        <span class="n">streamConfig</span><span class="p">.</span><span class="n">pixelFormat</span> <span class="o">=</span> <span class="n">format</span><span class="p">;</span>
+        <span class="k">break</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// Validate the current configuration is correct</span>
+<span class="n">config</span><span class="o">-&gt;</span><span class="n">validate</span><span class="p">();</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"Default viewfinder configuration is: "</span> <span class="o">&lt;&lt;</span> <span class="n">streamConfig</span><span class="p">.</span><span class="n">toString</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="c1">// Set the config to the camera</span>
+<span class="n">camera</span><span class="o">-&gt;</span><span class="n">configure</span><span class="p">(</span><span class="n">config</span><span class="p">.</span><span class="n">get</span><span class="p">());</span>
+</code></pre></div></div>
+
+<p>As a next step, we need to allocate buffers, then these buffers will be sent to libcamera, which will fill them with frames from camera and return it back to us to be consumed. We allocate buffers for each stream and then we need to iterate over the vector of <code class="language-plaintext highlighter-rouge">FrameBuffer</code>s and also create request to libcamera to get back filled <code class="language-plaintext highlighter-rouge">FrameBuffer</code>s. So we create request, pass <code class="language-plaintext highlighter-rouge">FrameBuffer</code> to the request and store the requests in an vector for now.</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Allocator object which is used to allocated framebuffers for eah stream</span>
+<span class="n">FrameBufferAllocator</span> <span class="o">*</span><span class="n">allocator</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">FrameBufferAllocator</span><span class="p">(</span><span class="n">camera</span><span class="p">);</span>
+<span class="k">for</span> <span class="p">(</span><span class="n">StreamConfiguration</span> <span class="o">&amp;</span><span class="n">cfg</span> <span class="o">:</span> <span class="o">*</span><span class="n">config</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">allocate</span><span class="p">(</span><span class="n">cfg</span><span class="p">.</span><span class="n">stream</span><span class="p">());</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="s">"Can't allocate buffers"</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+        <span class="k">return</span> <span class="o">-</span><span class="n">ENOMEM</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// Get the actual object which represents a stream</span>
+<span class="n">Stream</span> <span class="o">*</span><span class="n">stream</span> <span class="o">=</span> <span class="n">streamConfig</span><span class="p">.</span><span class="n">stream</span><span class="p">();</span>
+<span class="c1">// Get the framebuffers allocated for the stream</span>
+<span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">unique_ptr</span><span class="o">&lt;</span><span class="n">FrameBuffer</span><span class="o">&gt;&gt;</span> <span class="o">&amp;</span><span class="n">buffers</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">-&gt;</span><span class="n">buffers</span><span class="p">(</span><span class="n">stream</span><span class="p">);</span>
+<span class="c1">// Create a vector for storing requests which will be queued laterop</span>
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">unique_ptr</span><span class="o">&lt;</span><span class="n">Request</span><span class="o">&gt;&gt;</span> <span class="n">requests</span><span class="p">;</span>
+
+<span class="c1">// Iterate over buffers to create requests for each buffer and push the</span>
+<span class="c1">// requests into an vector</span>
+<span class="k">for</span> <span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">unique_ptr</span><span class="o">&lt;</span><span class="n">FrameBuffer</span><span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">buffer</span> <span class="o">:</span> <span class="n">buffers</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">unique_ptr</span><span class="o">&lt;</span><span class="n">Request</span><span class="o">&gt;</span> <span class="n">request</span> <span class="o">=</span> <span class="n">camera</span><span class="o">-&gt;</span><span class="n">createRequest</span><span class="p">();</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">request</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="s">"Can't create request"</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+        <span class="k">return</span> <span class="o">-</span><span class="n">ENOMEM</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="kt">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">request</span><span class="o">-&gt;</span><span class="n">addBuffer</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">buffer</span><span class="p">.</span><span class="n">get</span><span class="p">());</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="s">"Can't set buffer for request"</span>
+                    <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+        <span class="k">return</span> <span class="n">ret</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">requests</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">request</span><span class="p">));</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Now we need to some how let libcamera know what should be done once the request is complete, i.e. the <code class="language-plaintext highlighter-rouge">FrameBuffer</code> is filled up with frames from the camera device. This is done by registering a callback function with libcamera, which will be called when a request is completed. This is very crucial function as it consumes the frames. After this we finally start the camera and iterate over the vector of requests we stored earlier, and pass these requests to the camera object and then wait for it to return.</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Register callback function for request completed signal</span>
+<span class="n">camera</span><span class="o">-&gt;</span><span class="n">requestCompleted</span><span class="p">.</span><span class="n">connect</span><span class="p">(</span><span class="n">requestComplete</span><span class="p">);</span>
+
+<span class="c1">// Finally start the camera</span>
+<span class="n">camera</span><span class="o">-&gt;</span><span class="n">start</span><span class="p">();</span>
+<span class="c1">// Iterate over the generated requests and queue them to libcamera to be fulfilled</span>
+<span class="k">for</span> <span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">unique_ptr</span><span class="o">&lt;</span><span class="n">libcamera</span><span class="o">::</span><span class="n">Request</span><span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">request</span> <span class="o">:</span> <span class="n">requests</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">camera</span><span class="o">-&gt;</span><span class="n">queueRequest</span><span class="p">(</span><span class="n">request</span><span class="p">.</span><span class="n">get</span><span class="p">());</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Now, a bit about Qt part. I create a QApplication object, this drives the application, also alloc a new QLabel which is used to display the QImage widget.</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// QAppplication main window object</span>
+<span class="n">QApplication</span> <span class="nf">window</span><span class="p">(</span><span class="n">argc</span><span class="p">,</span> <span class="n">argv</span><span class="p">);</span>
+<span class="c1">// alloc memory for viewfinder_label</span>
+<span class="n">viewfinder_label</span> <span class="o">=</span> <span class="k">new</span> <span class="n">QLabel</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>Next, comes the callback, it is passed a Request object, which has all the data from the camera, which is <code class="language-plaintext highlighter-rouge">FrameBuffer</code> and <code class="language-plaintext highlighter-rouge">Stream</code>. Here we extract the buffer from the <code class="language-plaintext highlighter-rouge">Request</code> object. Also read into the metadata to get some frame info to be printed for debugging. The <code class="language-plaintext highlighter-rouge">FrameBuffer</code> is a not a simple <code class="language-plaintext highlighter-rouge">uchar</code> array. It also has several other things, so we need the data in <code class="language-plaintext highlighter-rouge">unsigned char</code> array to be useful for QImage. After this we record the current CPU time, and find the time difference between previous call to this function and current call, this is used to calculate the FPS and display it. After this we load image into QImage widget and also display the FPS. Once we are done, we notify that we want to reuse the existing buffers for future requests, and then queue a new request, so that it goes on.</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Callback function which processes the request once it has been completed by libcamera</span>
+<span class="k">static</span> <span class="kt">void</span> <span class="nf">requestComplete</span><span class="p">(</span><span class="n">Request</span> <span class="o">*</span><span class="n">request</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="c1">// Check if the request has been cancelled</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">request</span><span class="o">-&gt;</span><span class="n">status</span><span class="p">()</span> <span class="o">==</span> <span class="n">Request</span><span class="o">::</span><span class="n">RequestCancelled</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="c1">// Extract the buffers filled with images from Request object passed by libcamera </span>
+    <span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">map</span><span class="o">&lt;</span><span class="k">const</span> <span class="n">Stream</span> <span class="o">*</span><span class="p">,</span> <span class="n">FrameBuffer</span> <span class="o">*&gt;</span> <span class="o">&amp;</span><span class="n">buffers</span> <span class="o">=</span> <span class="n">request</span><span class="o">-&gt;</span><span class="n">buffers</span><span class="p">();</span>
+
+    <span class="c1">// Iterate over the buffer pairs</span>
+    <span class="k">for</span> <span class="p">(</span><span class="k">auto</span> <span class="n">bufferPair</span> <span class="o">:</span> <span class="n">buffers</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// Use framebuffer which has the image data</span>
+        <span class="n">FrameBuffer</span> <span class="o">*</span><span class="n">buffer</span> <span class="o">=</span> <span class="n">bufferPair</span><span class="p">.</span><span class="n">second</span><span class="p">;</span>
+
+        <span class="c1">// Use the frame metadata</span>
+        <span class="k">const</span> <span class="n">FrameMetadata</span> <span class="o">&amp;</span><span class="n">metadata</span> <span class="o">=</span> <span class="n">buffer</span><span class="o">-&gt;</span><span class="n">metadata</span><span class="p">();</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">" seq: "</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">setw</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">setfill</span><span class="p">(</span><span class="sc">'0'</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">metadata</span><span class="p">.</span><span class="n">sequence</span> <span class="o">&lt;&lt;</span> <span class="s">" bytesused: "</span><span class="p">;</span>
+
+        <span class="c1">// Calculate the amount of storage used for a single frame</span>
+        <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">nplane</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="k">for</span> <span class="p">(</span><span class="k">const</span> <span class="n">FrameMetadata</span><span class="o">::</span><span class="n">Plane</span> <span class="o">&amp;</span><span class="n">plane</span> <span class="o">:</span> <span class="n">metadata</span><span class="p">.</span><span class="n">planes</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">plane</span><span class="p">.</span><span class="n">bytesused</span><span class="p">;</span>
+            <span class="k">if</span> <span class="p">(</span><span class="o">++</span><span class="n">nplane</span> <span class="o">&lt;</span> <span class="n">metadata</span><span class="p">.</span><span class="n">planes</span><span class="p">.</span><span class="n">size</span><span class="p">())</span>
+                <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"/"</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+        <span class="c1">// Find the size of buffer</span>
+        <span class="kt">size_t</span> <span class="n">size</span> <span class="o">=</span> <span class="n">buffer</span><span class="o">-&gt;</span><span class="n">metadata</span><span class="p">().</span><span class="n">planes</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">bytesused</span><span class="p">;</span>
+        <span class="k">const</span> <span class="n">FrameBuffer</span><span class="o">::</span><span class="n">Plane</span> <span class="o">&amp;</span><span class="n">plane</span> <span class="o">=</span> <span class="n">buffer</span><span class="o">-&gt;</span><span class="n">planes</span><span class="p">().</span><span class="n">front</span><span class="p">();</span>
+        <span class="kt">void</span> <span class="o">*</span><span class="n">memory</span> <span class="o">=</span> <span class="n">mmap</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="n">plane</span><span class="p">.</span><span class="n">length</span><span class="p">,</span> <span class="n">PROT_READ</span><span class="p">,</span> <span class="n">MAP_SHARED</span><span class="p">,</span> <span class="n">plane</span><span class="p">.</span><span class="n">fd</span><span class="p">.</span><span class="n">fd</span><span class="p">(),</span> <span class="mi">0</span><span class="p">);</span>
+
+        <span class="c1">// Load image from a raw buffer into the QImage widget</span>
+        <span class="n">viewfinder</span><span class="p">.</span><span class="n">loadFromData</span><span class="p">(</span><span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*&gt;</span><span class="p">(</span><span class="n">memory</span><span class="p">),</span> <span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">size</span><span class="p">);</span>
+
+        <span class="c1">// Record the current time and find the time elapsed between two frames</span>
+        <span class="c1">// to calculate the FPS</span>
+        <span class="kt">clock_t</span> <span class="n">current_time</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">clock</span><span class="p">();</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">fps_string</span> <span class="o">=</span> <span class="s">"FPS: "</span> <span class="o">+</span> <span class="n">std</span><span class="o">::</span><span class="n">to_string</span><span class="p">(</span><span class="n">CLOCKS_PER_SEC</span> <span class="o">/</span> <span class="p">(</span><span class="kt">float</span><span class="p">)(</span><span class="n">current_time</span> <span class="o">-</span> <span class="n">prev_time</span><span class="p">));</span>
+        <span class="n">prev_time</span> <span class="o">=</span> <span class="n">current_time</span><span class="p">;</span>
+
+        <span class="c1">// Display the FPS</span>
+        <span class="n">QPainter</span> <span class="n">fps_label</span><span class="p">(</span><span class="o">&amp;</span><span class="n">viewfinder</span><span class="p">);</span>
+        <span class="n">fps_label</span><span class="p">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QPen</span><span class="p">(</span><span class="n">Qt</span><span class="o">::</span><span class="n">black</span><span class="p">));</span>
+        <span class="n">fps_label</span><span class="p">.</span><span class="n">setFont</span><span class="p">(</span><span class="n">QFont</span><span class="p">(</span><span class="s">"Times"</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="n">QFont</span><span class="o">::</span><span class="n">Bold</span><span class="p">));</span>
+        <span class="n">fps_label</span><span class="p">.</span><span class="n">drawText</span><span class="p">(</span><span class="n">viewfinder</span><span class="p">.</span><span class="n">rect</span><span class="p">(),</span> <span class="n">Qt</span><span class="o">::</span><span class="n">AlignBottom</span> <span class="o">|</span> <span class="n">Qt</span><span class="o">::</span><span class="n">AlignLeft</span><span class="p">,</span> <span class="n">QString</span><span class="o">::</span><span class="n">fromStdString</span><span class="p">(</span><span class="n">fps_string</span><span class="p">));</span>
+
+        <span class="c1">// Set the label and show it</span>
+        <span class="n">viewfinder_label</span><span class="o">-&gt;</span><span class="n">setPixmap</span><span class="p">(</span><span class="n">QPixmap</span><span class="o">::</span><span class="n">fromImage</span><span class="p">(</span><span class="n">viewfinder</span><span class="p">));</span>
+        <span class="n">viewfinder_label</span><span class="o">-&gt;</span><span class="n">show</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="c1">// Indicate that we want to reuse the same buffers passed earlier</span>
+    <span class="n">request</span><span class="o">-&gt;</span><span class="n">reuse</span><span class="p">(</span><span class="n">Request</span><span class="o">::</span><span class="n">ReuseBuffers</span><span class="p">);</span>
+    <span class="c1">// Queue a new request for frames to libcamera</span>
+    <span class="n">camera</span><span class="o">-&gt;</span><span class="n">queueRequest</span><span class="p">(</span><span class="n">request</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Here, we need to call <code class="language-plaintext highlighter-rouge">window.exec</code> function, it handles all Qt related tasks. This is a blocking function, after we quit the application this function exits. We can handle the stuff to deallocate and shutdown libcamera after this, so that application quits gracefully.</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Qt window handler</span>
+<span class="kt">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">window</span><span class="p">.</span><span class="n">exec</span><span class="p">();</span>
+
+<span class="c1">// deallocate after closing window</span>
+<span class="n">camera</span><span class="o">-&gt;</span><span class="n">stop</span><span class="p">();</span>
+<span class="n">allocator</span><span class="o">-&gt;</span><span class="n">free</span><span class="p">(</span><span class="n">stream</span><span class="p">);</span>
+<span class="k">delete</span> <span class="n">allocator</span><span class="p">;</span>
+<span class="n">camera</span><span class="o">-&gt;</span><span class="n">release</span><span class="p">();</span>
+<span class="n">camera</span><span class="p">.</span><span class="n">reset</span><span class="p">();</span>
+<span class="n">cm</span><span class="o">-&gt;</span><span class="n">stop</span><span class="p">();</span>
+<span class="k">delete</span> <span class="n">viewfinder_label</span><span class="p">;</span>
+
+<span class="k">return</span> <span class="n">ret</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>So, here is how it worked !! Was lot of fun :) I have attached a screen grab of the application running below.</p>
+
+<p align="center"><img class="img-fluid rounded z-depth-1" src="/assets/img/libcamera-2/app-snap.png" /></p>]]></content><author><name></name></author><summary type="html"><![CDATA[This is a log for documenting issues/observations encountered while creating an Qt app with libcamera]]></summary></entry><entry><title type="html">Getting started with libcamera</title><link href="/blog/2021/libcamera-log/" rel="alternate" type="text/html" title="Getting started with libcamera" /><published>2021-03-23T23:40:16+00:00</published><updated>2021-03-23T23:40:16+00:00</updated><id>/blog/2021/libcamera-log</id><content type="html" xml:base="/blog/2021/libcamera-log/"><![CDATA[<p><strong>I am applying for GSoC again, but this time with libcamera. I will log issues I faced while compiling and running it</strong></p>
+
+<ul>
+  <li>I first of all completed the getting started section of libcamera, it involved setting up and compiling libcamera and then using the libcamera’s gstreamer element to view the camera.</li>
+  <li>I had some issues with installing meson, it was due to conflict between system-wide and local meson installation, nevertheless it was fixed by doing a clean install of meson.</li>
+  <li>libcamera compiled fine and installed alright. Next step was running qcam, as I was not versed with meson, it took some time to figure out how to do it, I found a meson_options.txt in the repository, it described different options that can be used during compilation. After tinkering for 10-15 mins, I discovered these options could be set using <code class="language-plaintext highlighter-rouge">-Doption=value</code>, so in my case here was the command I passed <code class="language-plaintext highlighter-rouge">meson build -Dqcam=enabled</code> and then did <code class="language-plaintext highlighter-rouge">ninja -C build install</code>, boom !! It worked and qcam was up and running.</li>
+  <li>Next step was getting it working using gstreamer element, here I hit a few roadblock, but libcamera community helped me out.</li>
+</ul>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vedant@veware:~/Programming/contributing/libcamera<span class="nv">$ </span>gst-launch-1.0 libcamerasrc camera-name<span class="o">=</span><span class="s2">"Camera 1"</span> <span class="o">!</span> videoconvert <span class="o">!</span> autovideosink
+Setting pipeline to PAUSED ...
+<span class="o">[</span>13:46:40.435410189] <span class="o">[</span>130071]  INFO IPAManager ipa_manager.cpp:136 libcamera is not installed. Adding <span class="s1">'/home/vedant/Programming/contributing/libcamera/build/src/ipa'</span> to the IPA search path
+<span class="o">[</span>13:46:40.437823453] <span class="o">[</span>130071]  INFO Camera camera_manager.cpp:293 libcamera v0.0.0+2399-f5d3fa12
+ERROR: Pipeline doesn<span class="s1">'t want to pause.
+ERROR: from element /GstPipeline:pipeline0/GstLibcameraSrc:libcamerasrc0: Could not find a camera named '</span>Camera 1<span class="s1">'.
+Additional debug info:
+../src/gstreamer/gstlibcamerasrc.cpp(231): gst_libcamera_src_open (): /GstPipeline:pipeline0/GstLibcameraSrc:libcamerasrc0:
+libcamera::CameraMananger::get() returned nullptr
+Setting pipeline to NULL ...
+Freeing pipeline ...
+</span></code></pre></div></div>
+
+<ul>
+  <li>It couldn’t find the camera from which it needs to read. At first I assumed it had to read from <code class="language-plaintext highlighter-rouge">/dev/media0</code> or <code class="language-plaintext highlighter-rouge">/dev/video0</code>, but that was not the case. I searched the internet for a possible fix, and found this: <a href="https://github.com/kbingham/libcamera/issues/23">https://github.com/kbingham/libcamera/issues/23</a> of some help, there’s an application built with libcamera called <code class="language-plaintext highlighter-rouge">cam</code> which lists the cameras detected in the system.</li>
+</ul>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vedant@veware:~/Programming/contributing/libcamera<span class="nv">$ </span>./build/src/cam/cam <span class="nt">--list</span>
+<span class="o">[</span>14:14:26.788501804] <span class="o">[</span>135352]  INFO IPAManager ipa_manager.cpp:136 libcamera is not installed. Adding <span class="s1">'/home/vedant/Programming/contributing/libcamera/build/src/ipa'</span> to the IPA search path
+<span class="o">[</span>14:14:26.791292800] <span class="o">[</span>135352]  INFO Camera camera_manager.cpp:293 libcamera v0.0.0+2399-f5d3fa12
+Available cameras:
+1: External camera <span class="s1">'HD WebCam: HD WebCam'</span> <span class="o">(</span><span class="se">\_</span>SB_.PCI0.XHC_.RHUB.HS07-7:1.0-0408:a060<span class="o">)</span>
+</code></pre></div></div>
+
+<ul>
+  <li>So, now I had the camera Id (<code class="language-plaintext highlighter-rouge">\_SB_.PCI0.XHC_.RHUB.HS07-7:1.0-0408:a060</code>) that needed to be passed to gst-streamer. Well, so I passed it as follows, but to my surprise it didn’t work out.</li>
+</ul>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vedant@veware:~/Programming/contributing/libcamera<span class="nv">$ </span>gst-launch-1.0 libcamerasrc camera-name<span class="o">=</span><span class="s2">"</span><span class="se">\_</span><span class="s2">SB_.PCI0.XHC_.RHUB.HS07-7:1.0-0408:a060"</span> <span class="o">!</span> videoconvert <span class="o">!</span> autovideosink
+Setting pipeline to PAUSED ...
+<span class="o">[</span>14:29:42.239109028] <span class="o">[</span>136560]  INFO IPAManager ipa_manager.cpp:136 libcamera is not installed. Adding <span class="s1">'/home/vedant/Programming/contributing/libcamera/build/src/ipa'</span> to the IPA search path
+<span class="o">[</span>14:29:42.242018936] <span class="o">[</span>136560]  INFO Camera camera_manager.cpp:293 libcamera v0.0.0+2399-f5d3fa12
+ERROR: Pipeline doesn<span class="s1">'t want to pause.
+ERROR: from element /GstPipeline:pipeline0/GstLibcameraSrc:libcamerasrc0: Could not find a camera named '</span>_SB_.PCI0.XHC_.RHUB.HS07-7:1.0-0408:a060<span class="s1">'.
+Additional debug info:
+../src/gstreamer/gstlibcamerasrc.cpp(231): gst_libcamera_src_open (): /GstPipeline:pipeline0/GstLibcameraSrc:libcamerasrc0:
+libcamera::CameraMananger::get() returned nullptr
+Setting pipeline to NULL ...
+Freeing pipeline ...
+</span></code></pre></div></div>
+
+<ul>
+  <li>Upon discussion on the IRC, I realised it was a issue with backlash, I had to somehow escape it. So changed the id to <code class="language-plaintext highlighter-rouge">\\_SB_.PCI0.XHC_.RHUB.HS07-7:1.0-0408:a060</code>, and it still didn’t work. I was scratching my head at this point. After a point I realised there might be a issue due to double quotes, replaced them with single quotes and it worked then. this was the command I ran <code class="language-plaintext highlighter-rouge">gst-launch-1.0 libcamerasrc camera-name='\\_SB_.PCI0.XHC_.RHUB.HS07-7:1.0-0408:a060' ! videoconvert ! autovideosink</code></li>
+</ul>
+
+<p align="center"><img class="img-fluid rounded z-depth-1" src="/assets/img/gstreamer-element-working.png" /></p>
+
+<p>The window shows patches of color, as I have covered the camera with a tape (yes I am paranoid), but it displays a image fine after removing the tape.</p>]]></content><author><name></name></author><summary type="html"><![CDATA[This is a log for documenting issues/observations encountered while compiling libcamera and using it]]></summary></entry><entry><title type="html">New blog</title><link href="/blog/2020/new-blog/" rel="alternate" type="text/html" title="New blog" /><published>2020-09-08T23:40:16+00:00</published><updated>2020-09-08T23:40:16+00:00</updated><id>/blog/2020/new-blog</id><content type="html" xml:base="/blog/2020/new-blog/"><![CDATA[<p>After spending days and days searching for a jekyll theme for my blog, I finally found an amazing theme. So, here it is, start of my first blog.</p>
+
+<p>Sounds interesting? Let’s see what the future holds. See you!</p>]]></content><author><name></name></author><summary type="html"><![CDATA[What this blog is about, and what can you expect from it in the future ?]]></summary></entry></feed>
