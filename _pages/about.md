@@ -17,10 +17,12 @@ Research Intern @MOONlab, IISER Bhopal  <br>
 Third year Computer Engineering undergrad from VJTI, Mumbai (2024). 
 
 My Research Interests are:
-* Robotics & Automation
+- Robotics & Automation
+  - SLAM
+  - Control Systems
+  - Autonomous vehicles
 * Computer Vision
-* SLAM
-* Control Systems
+
 
 You can reach me out on Matrix [@kunalagarwal18:matrix.org](https://matrix.to/#/kunalagarwal18:matrix.org) or email me at [kunalagarwal1072002@gmail.com](mailto:kunalagarwal1072002@gmail.com)
 
