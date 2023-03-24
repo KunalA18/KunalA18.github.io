@@ -65,7 +65,7 @@ body.sticky-bottom-footer {
 }
 
 .container {
-  max-width: 800px;
+  max-width: 1000px;
 }
 
 .profile img {
@@ -445,7 +445,7 @@ footer.sticky-bottom {
   align-items: center;
 }
 .projects .grid-sizer, .projects .grid-item {
-  width: 370px;
+  width: 477px;
   margin-bottom: 20px;
 }
 .projects h2.category {

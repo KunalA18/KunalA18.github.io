@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Getting started with libcamera
+title: "Getting started with libcamera"
 date:   2022-07-22 
 description: A blog which sums up my pre-GSoC journey with libcamera
 ---
