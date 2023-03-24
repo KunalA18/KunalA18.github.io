@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
-<loc>http://localhost:4000/news/announcement_2/</loc>
-<lastmod>2015-11-08T01:41:00+05:30</lastmod>
-</url>
-<url>
-<loc>http://localhost:4000/news/announcement_3/</loc>
-<lastmod>2016-01-15T17:29:00+05:30</lastmod>
-</url>
-<url>
 <loc>http://localhost:4000/blog/2022/getting-started-with-libcamera/</loc>
 <lastmod>2022-07-22T00:00:00+05:30</lastmod>
 </url>
@@ -18,23 +10,23 @@
 </url>
 <url>
 <loc>http://localhost:4000/projects/1_project/</loc>
-<lastmod>2023-03-24T23:36:05+05:30</lastmod>
+<lastmod>2023-03-25T00:00:07+05:30</lastmod>
 </url>
 <url>
 <loc>http://localhost:4000/projects/2_project/</loc>
-<lastmod>2023-03-24T23:36:05+05:30</lastmod>
+<lastmod>2023-03-25T00:00:07+05:30</lastmod>
 </url>
 <url>
 <loc>http://localhost:4000/projects/3_project/</loc>
-<lastmod>2023-03-24T23:36:05+05:30</lastmod>
+<lastmod>2023-03-25T00:00:07+05:30</lastmod>
 </url>
 <url>
 <loc>http://localhost:4000/projects/4_project/</loc>
-<lastmod>2023-03-24T23:36:05+05:30</lastmod>
+<lastmod>2023-03-25T00:00:07+05:30</lastmod>
 </url>
 <url>
 <loc>http://localhost:4000/projects/5_project/</loc>
-<lastmod>2023-03-24T23:36:05+05:30</lastmod>
+<lastmod>2023-03-25T00:00:07+05:30</lastmod>
 </url>
 <url>
 <loc>http://localhost:4000/</loc>

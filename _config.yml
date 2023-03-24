@@ -72,7 +72,7 @@ panelbear_analytics: XXXXXXXXX # panelbear analytics site ID
 # Blog
 # -----------------------------------------------------------------------------
 
-blog_name: Kunal Agarwal # your blog must have a name for it to show up in the nav bar
+blog_name: Blogs # your blog must have a name for it to show up in the nav bar
 blog_description: A collection of my thoughts and ideas
 permalink: /blog/:year/:title/
 
