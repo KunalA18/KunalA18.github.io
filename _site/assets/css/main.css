@@ -659,10 +659,10 @@ d-byline a:hover, d-article d-byline a:hover {
 d-article {
   border-top-color: #e8e8e8 !important;
 }
-d-article a, d-article p, d-article h1, d-article h2, d-article h3, d-article h4, d-article h5, d-article h6, d-article li, d-article table {
+d-article p, d-article h1, d-article h2, d-article h3, d-article h4, d-article h5, d-article h6, d-article li, d-article table {
   color: var(--global-text-color) !important;
 }
-d-article a, d-article h1, d-article h2, d-article hr {
+d-article h1, d-article h2, d-article hr, d-article table, d-article table th, d-article table td {
   border-bottom-color: #e8e8e8 !important;
 }
 d-article a:hover {
