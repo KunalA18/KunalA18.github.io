@@ -7,3 +7,4 @@ github: https://github.com/vorachaitya/HackTrack
 importance: 5
 ---
 
+For more details, visit the Github repo of this project by clicking on the Github icon on the previous page!!

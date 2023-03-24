@@ -7,3 +7,4 @@ github: https://github.com/ParthShirole/Street-Racer-2D
 importance: 4
 ---
 
+For more details, visit the Github repo of this project by clicking on the Github icon on the previous page!!

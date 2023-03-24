@@ -7,3 +7,4 @@ github: https://github.com/KunalA18/Functional-Weeder
 importance: 1
 ---
 
+For more details, visit the Github repo of this project by clicking on the Github icon on the previous page!!
