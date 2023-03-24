@@ -11,7 +11,7 @@
   Kunal  Agarwal
 
 
-  | Bringing up the parsec-3.0 benchmark
+  | Final GSoC report
 
 </title>
 <meta name="description" content="Portfolio and blog for Kunal Agarwal.
@@ -37,7 +37,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👨‍💻</text></svg>">
 
 <link rel="stylesheet" href="/assets/css/main.css">
-<link rel="canonical" href="/blog/2022/running-parsec-benchmark/">
+<link rel="canonical" href="/Gsoc_22_Final/">
 
 <!-- JQuery -->
 <!-- jQuery -->
@@ -101,7 +101,7 @@
           </li>
           
           <!-- Blog -->
-          <li class="nav-item active">
+          <li class="nav-item ">
             <a class="nav-link" href="/blog/">
               blog
               
@@ -109,8 +109,6 @@
           </li>
           
           <!-- Other pages -->
-          
-          
           
           
           
@@ -171,81 +169,12 @@
 <div class="post">
 
   <header class="post-header">
-    <h1 class="post-title">Bringing up the parsec-3.0 benchmark</h1>
-    <p class="post-meta">February 25, 2022</p>
+    <h1 class="post-title">Final GSoC report</h1>
+    <p class="post-meta">November 19, 2022</p>
   </header>
 
   <article class="post-content">
-    <h2 id="what-is-parsec-">What is PARSEC ?</h2>
-
-<p>The Princeton Application Repository for Shared-Memory Computers (PARSEC) is a benchmark suite composed of multithreaded programs. The suite focuses on emerging workloads and was designed to be representative of next-generation shared-memory programs for chip-multiprocessors.</p>
-
-<h2 id="getting-started">Getting started</h2>
-
-<ul>
-  <li>Download the <a href="https://parsec.cs.princeton.edu/index.htm">PARSEC</a> release 3.0 from here the site</li>
-</ul>
-
-<p align="center">
-    <a href="http://parsec.cs.princeton.edu/download/3.0/parsec-3.0.tar.gz">
-        <img class="img-fluid rounded z-depth-1" src="https://parsec.cs.princeton.edu/image/download-3.0.png" />
-    </a>
-</p>
-
-<ul>
-  <li>
-    <p>Download the tutorial for parsec-3.0 from <a href="https://parsec.cs.princeton.edu/download/tutorial/3.0/parsec-tutorial.pdf">here</a> or refer to the <a href="https://parsec.cs.princeton.edu/parsec3-doc.htm">wiki</a> one. The pdf tutorial seems to be hidden off in some corner of the website unfortunately.</p>
-  </li>
-  <li>Source the env by going into the parsec root directory.
-    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>source env.sh
-</code></pre></div>    </div>
-  </li>
-  <li>Build all the apps that can be benchmarked
-    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>parsecmgmt -a build -p all -c gcc
-</code></pre></div>    </div>
-  </li>
-</ul>
-
-<h2 id="issues-faced">Issues faced</h2>
-
-<p>Here are some of the links which helped me solve the issues.</p>
-
-<ul>
-  <li><a href="https://yulistic.gitlab.io/2016/05/parsec-3.0-installation-issues/">https://yulistic.gitlab.io/2016/05/parsec-3.0-installation-issues/</a></li>
-  <li><a href="https://groups.google.com/g/snipersim/c/8q9mjnoePbM">https://groups.google.com/g/snipersim/c/8q9mjnoePbM</a></li>
-  <li><a href="https://github.com/lutris/ffmpeg-nvenc/issues/5">https://github.com/lutris/ffmpeg-nvenc/issues/5</a></li>
-</ul>
-
-<p>The first link is very detailed, please go through that first to check if you encounter any of the above issues. Other than those issues, I have listed the ones I faced.</p>
-
-<p>1) Issue with C++ version</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>In file included from /home/qfettes/benchmarks/parsec/parsec-2.1/./pkgs/apps/bodytrack/src/TrackingBenchmark/threads/WorkerGroup.cpp:17:0:
-/home/qfettes/benchmarks/parsec/parsec-2.1/./pkgs/apps/bodytrack/src/TrackingBenchmark/threads/WorkerGroup.h:88:5: error: looser throw specifier <span class="k">for</span> <span class="s1">'virtual threads::WorkerGroup::~WorkerGroup() throw (threads::CondException, threads::MutexException)'</span>
-     ~WorkerGroup<span class="o">()</span><span class="p">;</span>
-     ^
-In file included from /home/qfettes/benchmarks/parsec/parsec-2.1/./pkgs/apps/bodytrack/src/TrackingBenchmark/threads/WorkerGroup.h:18:0,
-                 from /home/qfettes/benchmarks/parsec/parsec-2.1/./pkgs/apps/bodytrack/src/TrackingBenchmark/threads/WorkerGroup.cpp:17:
-/home/qfettes/benchmarks/parsec/parsec-2.1/./pkgs/apps/bodytrack/src/TrackingBenchmark/threads/Thread.h:31:13: error:   overriding <span class="s1">'virtual threads::Runnable::~Runnable() noexcept'</span>
-     virtual ~Runnable<span class="o">()</span> <span class="o">{}</span><span class="p">;</span>
-</code></pre></div></div>
-
-<p>Solution: Add <code class="language-plaintext highlighter-rouge">-std=c++11</code> to the line <code class="language-plaintext highlighter-rouge">export CXXFLAGS</code> in the file <code class="language-plaintext highlighter-rouge">config/gcc.bldconf</code></p>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>export CXXFLAGS="-O3 -g -funroll-loops -fprefetch-loop-arrays -fpermissive -fno-exceptions ${PORTABILITY_FLAGS} -std=c++11"
-</code></pre></div></div>
-
-<p>2) Issue with compiling x264</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/usr/bin/ld: libx264.a<span class="o">(</span>cabac-a.o<span class="o">)</span>: relocation R_X86_64_32 against symbol x264_cabac_range_lps<span class="s1">' can not be used when making a shared object; recompile with -fPIC /usr/bin/ld: libx264.a(quant-a.o): relocation R_X86_64_32 against hidden symbolx264_pb_01'</span> can not be used when making a shared object
-/usr/bin/ld: libx264.a<span class="o">(</span>dct-a.o<span class="o">)</span>: relocation R_X86_64_32 against hidden symbol x264_pw_8000<span class="s1">' can not be used when making a shared object /usr/bin/ld: libx264.a(deblock-a.o): relocation R_X86_64_32 against hidden symbolx264_pb_1'</span> can not be used when making a shared object
-/usr/bin/ld: libx264.a<span class="o">(</span>mc-a.o<span class="o">)</span>: relocation R_X86_64_32 against hidden symbol x264_pw_64<span class="s1">' can not be used when making a shared object /usr/bin/ld: libx264.a(mc-a2.o): relocation R_X86_64_32 against hidden symbolx264_pw_32'</span> can not be used when making a shared object
-</code></pre></div></div>
-
-<p>Solution: The problem here is that we need to enable fPIC in the configure step. Add <code class="language-plaintext highlighter-rouge">--enable-pic </code> to <code class="language-plaintext highlighter-rouge">build_conf</code> in the file <code class="language-plaintext highlighter-rouge">pkgs/apps/x264/parsec/gcc-pthreads.bldconf</code></p>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>build_conf="--enable-pthread --enable-pic --extra-asflags=\"${ASFLAGS}\" --extra-cflags=\"${CFLAGS}\" --extra-ldflags=\"${LDFLAGS} ${LIBS}\""
-</code></pre></div></div>
+    
 
   </article>
 
@@ -265,7 +194,7 @@ In file included from /home/qfettes/benchmarks/parsec/parsec-2.1/./pkgs/apps/bod
 
     
     
-    Last updated: March 21, 2023.
+    Last updated: March 24, 2023.
     
   </div>
 </footer>
