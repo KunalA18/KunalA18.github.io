@@ -11,7 +11,7 @@
   Kunal  Agarwal
 
 
-  | E-Paper Display library
+  | Sketch-2-Paint
 
 </title>
 <meta name="description" content="Portfolio and blog for Kunal Agarwal.
@@ -167,65 +167,12 @@
       <div class="post">
 
   <header class="post-header">
-    <h1 class="post-title">E-Paper Display library</h1>
-    <p class="post-description">ESP-IDF component for Waveshare epaper displays</p>
+    <h1 class="post-title">Sketch-2-Paint</h1>
+    <p class="post-description">a CGAN which accepts a 256x256 px black and white sketch image and predicts the colored version of the image without knowing the ground truth.</p>
   </header>
 
   <article>
-    <p>ESP-IDF Component for driving waveshare’s epaper displays. This is a port of Waveshare’s official code for driving epaper display.</p>
-
-<ul class="task-list">
-  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><a href="https://www.waveshare.com/wiki/1.02inch_e-paper_Module"> 1.02” D module</a></li>
-  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" /><a href="https://www.waveshare.com/wiki/1.54inch_e-Paper_Module"> 1.54” V2 module</a></li>
-  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><a href="https://www.waveshare.com/wiki/1.54inch_e-Paper_Module_(B)"> 1.54” B module</a></li>
-  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><a href="https://www.waveshare.com/wiki/1.54inch_e-Paper_Module_(C)"> 1.54” C module</a></li>
-  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><a href="https://www.waveshare.com/wiki/2.13inch_e-Paper_HAT"> 2.13” V2 module</a></li>
-  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><a href="https://www.waveshare.com/wiki/2.13inch_e-Paper_HAT_(B)"> 2.13” B module</a></li>
-  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><a href="https://www.waveshare.com/wiki/2.13inch_e-Paper_HAT_(C)"> 2.13” C module</a></li>
-  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" /><a href="https://www.waveshare.com/wiki/2.13inch_e-Paper_HAT_(D)"> 2.13” D module</a></li>
-  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><a href="https://www.waveshare.com/wiki/2.66inch_e-Paper_Module"> 2.66” module</a></li>
-  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" /><a href="https://www.waveshare.com/wiki/2.7inch_e-Paper_HAT"> 2.7” module</a></li>
-  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><a href="https://www.waveshare.com/wiki/2.7inch_e-Paper_HAT_(B)"> 2.7” B module</a></li>
-</ul>
-
-<p><img src="/assets/img/epaper_working.gif" alt="" /></p>
-
-<h2 id="example-code">Example code</h2>
-
-<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include</span> <span class="cpf">"epaper.h"</span><span class="cp">
-#include</span> <span class="cpf">"esp_log.h"</span><span class="cp">
-#include</span> <span class="cpf">"freertos/FreeRTOS.h"</span><span class="cp">
-#include</span> <span class="cpf">"freertos/task.h"</span><span class="cp">
-#include</span> <span class="cpf">"driver/timer.h"</span><span class="cp">
-</span>
-<span class="cp">#define COLORED     0
-#define UNCOLORED   1
-</span>
-<span class="k">extern</span> <span class="s">"C"</span> <span class="kt">void</span> <span class="nf">app_main</span><span class="p">()</span> 
-<span class="p">{</span>
-  <span class="n">Epd</span> <span class="n">epd</span><span class="p">;</span>
-
-  <span class="kt">unsigned</span> <span class="kt">char</span><span class="o">*</span> <span class="n">frame_</span> <span class="o">=</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">epd</span><span class="p">.</span><span class="n">width</span> <span class="o">*</span> <span class="n">epd</span><span class="p">.</span><span class="n">height</span> <span class="o">/</span> <span class="mi">8</span><span class="p">);</span>
-
-  <span class="n">Paint</span> <span class="n">paint_</span><span class="p">(</span><span class="n">frame_</span><span class="p">,</span> <span class="n">epd</span><span class="p">.</span><span class="n">width</span><span class="p">,</span> <span class="n">epd</span><span class="p">.</span><span class="n">height</span><span class="p">);</span>
-  <span class="n">paint_</span><span class="p">.</span><span class="n">Clear</span><span class="p">(</span><span class="n">UNCOLORED</span><span class="p">);</span>
-
-  <span class="n">ESP_LOGI</span><span class="p">(</span><span class="s">"EPD"</span><span class="p">,</span> <span class="s">"e-Paper init and clear"</span><span class="p">);</span>
-  <span class="n">epd</span><span class="p">.</span><span class="n">LDirInit</span><span class="p">();</span>
-  <span class="n">epd</span><span class="p">.</span><span class="n">Clear</span><span class="p">();</span>
-
-  <span class="n">vTaskDelay</span><span class="p">(</span><span class="mi">2000</span><span class="p">);</span>
-  <span class="kt">int</span> <span class="n">d</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
-  <span class="k">for</span> <span class="p">(</span><span class="kt">char</span> <span class="n">i</span> <span class="o">=</span> <span class="sc">'0'</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="sc">'9'</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
-  <span class="p">{</span>
-    <span class="n">paint_</span><span class="p">.</span><span class="n">DrawCharAt</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">Font20</span><span class="p">,</span> <span class="n">COLORED</span><span class="p">);</span>
-    <span class="n">epd</span><span class="p">.</span><span class="n">DisplayPart</span><span class="p">(</span><span class="n">frame_</span><span class="p">);</span>
-    <span class="n">vTaskDelay</span><span class="p">(</span><span class="mi">100</span><span class="p">);</span>
-    <span class="n">d</span> <span class="o">=</span> <span class="n">d</span> <span class="o">+</span> <span class="mi">20</span><span class="p">;</span> 
-  <span class="p">}</span>
-  <span class="n">epd</span><span class="p">.</span><span class="n">Sleep</span><span class="p">();</span>
-<span class="p">}</span>
-</code></pre></div></div>
+    
 
   </article>
 
