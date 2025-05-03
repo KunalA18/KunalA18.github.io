@@ -1,8 +1,8 @@
 ---
 layout: page
-title: Projects/Competitions
-permalink: /projects/
-description: My projects.
+title: MOOC-Certificates
+permalink: /mooc/
+# description: MOOCs-Certificates
 nav: true
 # display_categories: [hardware, software
 horizontal: false

@@ -6,22 +6,19 @@ description: Robotics & Computer Vision enthusiast
 
 profile:
   align: right
-  image: img_profile.jpeg
+  image: KUNAL_AGARWAL_BANGALORE.png
 
 news: false  # includes a list of news items
 selected_papers: false # includes a list of papers marked as "selected={true}"
 social: true  # includes social icons at the bottom of the page
 ---
-
-Research Intern @MOONlab, IISER Bhopal  <br>
-Third year Computer Engineering undergrad from VJTI, Mumbai (2024). 
+Hi, I am Kunal Agarwal <br>
+I have completed my B.Tech in Computer Engineering from Veermata Jijabai Technological Institute, Mumbai, India. <br>
+I am currently working as Software Engineer at VISA
 
 My Research Interests are:
-- Robotics & Automation
-  - SLAM
-  - Control Systems
-  - Autonomous vehicles
-* Computer Vision
+- Robotics and Automation: SLAM (Simultaneous Localization and Mapping), Autonomous Vehicles
+* Perception and Path planning for Autonomous Systems
 
 
 You can reach me out on Matrix [@kunalagarwal18:matrix.org](https://matrix.to/#/kunalagarwal18:matrix.org) or email me at [kunalagarwal1072002@gmail.com](mailto:kunalagarwal1072002@gmail.com)
