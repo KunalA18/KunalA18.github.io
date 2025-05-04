@@ -1,0 +1,27 @@
+<div class="project-container">
+    <div class="project-card">
+      <div class="card">
+        {% if project.img %}
+        <!-- Image is not clickable -->
+        <img src="{{ project.img | relative_url }}" alt="project thumbnail" class="card-img">
+        {% endif %}
+        <div class="card-body">
+          <!-- Title is not clickable -->
+          <h2 class="card-title">{{ project.title }}</h2>
+          <!-- Description is not clickable -->
+          <p class="card-text">{{ project.description }}</p>
+          <div class="card-footer">
+            {% if project.github %}
+            <div class="github-icon">
+              <div class="icon" data-toggle="tooltip" title="Code Repository">
+                <a href="{{ project.github }}" target="_blank">
+                  <span class="checkout-text">Checkout</span>
+                </a>
+              </div>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

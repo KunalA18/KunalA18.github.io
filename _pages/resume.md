@@ -4,6 +4,7 @@ permalink: /resume/
 title: Resume
 nav: true
 description:
+url: /assets/pdf/Kunal_Agarwal.pdf
 # years: [2022]
 ---
 ### Click [here](/assets/pdf/Kunal_Agarwal.pdf)

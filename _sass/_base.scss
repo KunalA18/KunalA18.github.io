@@ -424,8 +424,18 @@ footer.sticky-bottom {
   }
 
   .card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    border: 1px solid #e0e0e0; /* Light gray border */
+    border-radius: 8px; /* Slightly rounded corners */
+    padding: 1rem; /* Add some inner spacing */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    margin: 2rem;
     img {
-      width: 100%;
+      width: 80%;
+      margin-bottom: 0px;
     }
   }
 
@@ -435,6 +445,7 @@ footer.sticky-bottom {
 
     .row {
       display: flex;
+      justify-content: center;
       align-items: center;
     }
   }
@@ -452,6 +463,50 @@ footer.sticky-bottom {
     margin-bottom: 1rem;
     text-align: right;
   }
+
+  .card-title {
+    margin: 0.2rem 0;
+  }
+
+  .card-text {
+    margin: 0.1rem 0;
+  }
+
+  .card-footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 0rem; /* Reduce space above footer */
+    padding-bottom: 0; /* Remove extra padding at the bottom */
+  
+    .github-icon {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+  
+      .github-link {
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        color: inherit; /* Matches the text color of the theme */
+  
+        &:hover .checkout-text {
+          color: var(--global-theme-color); /* Highlight color on hover */
+        }
+  
+        .gh-icon {
+          font-size: 2rem; /* Icon size */
+          margin-right: 0.5rem; /* Space between the icon and text */
+        }
+  
+        .checkout-text {
+          font-size: 2rem; /* Text size */
+          font-weight: 500; /* Slightly bold text */
+        }
+      }
+    }
+  }
+  
 }
 
 
